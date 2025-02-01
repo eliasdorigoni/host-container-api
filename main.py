@@ -8,6 +8,12 @@ def read_root():
     return {"Hello": "World"}
 
 
+@app.get("/status")
+def read_status():
+    from lib.HostContainerService import HostContainerService
+    return HostContainerService("status").run_action()
+
+
 @app.get("/get-{action_name}")
 def read_get_from_host(action_name: str):
     from lib.HostContainerService import HostContainerService

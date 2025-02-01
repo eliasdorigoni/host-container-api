@@ -18,7 +18,7 @@ create_pipes_from_script_names() {
     done <<< "$SCRIPTS"
 }
 
-# Runs
+# If incoming pipe has data, runs the command
 check_incoming_pipe() {
   INPUT=$( cat "$CONTAINER_TO_HOST_PIPE" )
   if [[ -z "$INPUT" ]]; then
@@ -38,7 +38,7 @@ check_incoming_pipe() {
     return
   fi
 
-  print "ERROR: unknown action ""$INPUT" > "$HOST_TO_CONTAINER_PIPE" ;;
+  print "ERROR: unknown action ""$INPUT" > "$HOST_TO_CONTAINER_PIPE"
 }
 
 
