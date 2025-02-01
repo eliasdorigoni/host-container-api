@@ -17,8 +17,7 @@ class HostContainerService:
     def get_available_commands(self) -> list[str]:
         commands = []
         for _, _, files in os.walk(self.commands_path):
-            commands = files
-
+            [commands.append(os.path.splitext(f)[0]) for f in files]
         return commands
 
     def run_action(self):
