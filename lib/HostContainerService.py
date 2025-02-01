@@ -26,6 +26,12 @@ class HostContainerService:
         in_fifo_path = self.pipes_path.joinpath(self.command_name + '.pipe')
         timeout_in_seconds = 3
 
+        if not os.path.exists(out_fifo_path):
+            raise FileNotFoundError('Missing fifo file: ' + out_fifo_path.name)
+
+        if not os.path.exists(in_fifo_path):
+            raise FileNotFoundError('Missing fifo file: ' + in_fifo_path.name)
+
         with open(out_fifo_path, 'w') as fh:
             fh.write(self.command_name)
 
