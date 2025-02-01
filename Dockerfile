@@ -9,6 +9,8 @@ RUN python -m venv venv \
     && pip install --no-cache-dir -r requirements.txt \
     && pip install --no-cache-dir "fastapi[standard]"
 
+COPY . .
+
 EXPOSE 8000
 
-CMD [ "python", "-m", "fastapi", "run", "main.py" ]
+CMD [ "venv/bin/python", "-m", "fastapi", "run", "main.py" ]
