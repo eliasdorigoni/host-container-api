@@ -12,7 +12,10 @@ create_fifo_if_not_exists() {
 
 # Creates files in output path with the names in actions directory
 create_pipes_from_script_names() {
-    SCRIPTS=$( find -P "$HOST_COMMANDS_PATH" -type f -name "*.sh" | cut -d"/" -f2 | sed 's/.sh//g' )
+    SCRIPTS=$( find -P "$HOST_COMMANDS_PATH" -type f -name "*.sh" -printf "%f\n" | cut -d"/" -f2 | sed 's/.sh//g' )
+
+    echo $SCRIPTS
+
     while IFS=' ' read -ra NAME; do
         create_fifo_if_not_exists "$PIPES_PATH""/""$NAME"".pipe"
     done <<< "$SCRIPTS"
@@ -31,6 +34,7 @@ check_incoming_pipe() {
   fi
 
   if [ "$INPUT" == "get-date" ] \
+    || [ "$INPUT" == "status" ] \
     || [ "$INPUT" == "get-home-server-existing-services" ] \
     || [ "$INPUT" == "get-home-server-running-containers" ] \
     || [ "$INPUT" == "get-proxymanager-hosts" ]; then
@@ -38,12 +42,12 @@ check_incoming_pipe() {
     return
   fi
 
-  print "ERROR: unknown action ""$INPUT" > "$HOST_TO_CONTAINER_PIPE"
+  print "ERROR: unknown action ""$INPUT"
 }
 
 
 create_pipes_from_script_names
-create_fifo_if_not_exists "$THIS_DIR""/pipes/""$CONTAINER_TO_HOST_PIPE"
+create_fifo_if_not_exists "$CONTAINER_TO_HOST_PIPE"
 
 while true
 do
