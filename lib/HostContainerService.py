@@ -24,7 +24,7 @@ class HostContainerService:
     def run_action(self):
         out_fifo_path = self.pipes_path.joinpath('container_to_host.pipe')
         in_fifo_path = self.pipes_path.joinpath(self.command_name + '.pipe')
-        timeout_in_seconds = 5
+        timeout_in_seconds = 3
 
         with open(out_fifo_path, 'w') as fh:
             fh.write(self.command_name)

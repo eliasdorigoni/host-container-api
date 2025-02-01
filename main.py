@@ -11,7 +11,13 @@ def read_root():
 @app.get("/status")
 def read_status():
     from lib.HostContainerService import HostContainerService
-    return HostContainerService("status").run_action()
+    try:
+        return HostContainerService("status").run_action()
+    except FileNotFoundError as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 
 @app.get("/get-{action_name}")
@@ -24,4 +30,10 @@ def read_get_from_host(action_name: str):
             "command-name": "get-" + action_name,
         }
 
-    return service.run_action()
+    try:
+        return service.run_action()
+    except FileNotFoundError as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
