@@ -5,16 +5,12 @@ APIs to interact with named pipes.
 
 ```yaml
 # docker-compose.yaml
+# assumes this is used as a submodule or nested
 services:
   host-container-api:
     container_name: host-container-api
-    command: [
-      "/app/venv/bin/python", "-m", "fastapi", "run", "/app/main.py",
-      "--host", "0.0.0.0",
-      "--port", "8080"
-    ]
-    image: python:3.11
+    build: ./host-container-api
     restart: unless-stopped
     volumes:
-      - ./:/app:
+      - ./host-container-api/:/app:
 ```
