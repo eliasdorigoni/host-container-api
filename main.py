@@ -20,7 +20,10 @@ def read_get_from_host(action_name: str, response: Response):
         }
 
     try:
-        return service.run_action()
+        return {
+            "success": True,
+            "data": service.run_action()
+        }
     except FileNotFoundError as e:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
         return {

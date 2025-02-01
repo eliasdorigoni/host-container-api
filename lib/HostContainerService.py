@@ -1,7 +1,6 @@
 import os
+import selectors
 from pathlib import Path
-
-import select
 
 
 class HostContainerService:
@@ -30,12 +29,21 @@ class HostContainerService:
         elif not os.path.exists(in_fifo_path):
             raise FileNotFoundError('Missing fifo file: ' + in_fifo_path.name)
 
+        # Send
         with open(out_fifo_path, 'w') as fh:
             fh.write(self.command_name)
 
-        with open(in_fifo_path, 'r') as fh:
-            while True:
-                readable, writable, exceptional = select.select([fh], [], [fh], timeout_in_seconds)
-                if not (readable or writable or exceptional):
-                    raise BrokenPipeError("Timeout reached for command " + self.command_name)
-                return fh.read()
+        # Receive
+        sel = selectors.DefaultSelector()
+        with open(in_fifo_path, 'r') as fifo:
+            sel.register(fifo, selectors.EVENT_READ)
+            events = sel.select(timeout_in_seconds)
+            if not events:
+                raise TimeoutError("No data received within the timeout period.")
+
+            for key, _ in sel.select():
+                data = key.fileobj.read().strip()
+                if data:
+                    return data
+
+        raise RuntimeError("No data received from named pipe.")
