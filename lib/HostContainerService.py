@@ -28,8 +28,7 @@ class HostContainerService:
 
         if not os.path.exists(out_fifo_path):
             raise FileNotFoundError('Missing fifo file: ' + out_fifo_path.name)
-
-        if not os.path.exists(in_fifo_path):
+        elif not os.path.exists(in_fifo_path):
             raise FileNotFoundError('Missing fifo file: ' + in_fifo_path.name)
 
         with open(out_fifo_path, 'w') as fh:
@@ -37,5 +36,7 @@ class HostContainerService:
 
         with open(in_fifo_path, 'r') as fh:
             while True:
-                select.select([fh], [], [fh], timeout_in_seconds)
+                readable, writable, exceptional = select.select([fh], [], [fh], timeout_in_seconds)
+                if not (readable or writable or exceptional):
+                    raise BrokenPipeError("Timeout reached for command " + self.command_name)
                 return fh.read()
