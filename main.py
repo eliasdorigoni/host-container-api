@@ -1,5 +1,5 @@
 from fastapi import FastAPI, status, Response
-from lib.HostContainerService import HostContainerService
+from lib.CommandService import CommandService
 
 app = FastAPI()
 
@@ -11,8 +11,8 @@ def read_root():
 
 @app.get("/commands/{action_name}", status_code=status.HTTP_200_OK)
 def read_get_from_host(action_name: str, response: Response):
-    service = HostContainerService(action_name)
-    if not service.is_existing_command:
+    cmd = CommandService(action_name)
+    if not cmd.exists():
         response.status_code = status.HTTP_404_NOT_FOUND
         return {
             "success": False,
@@ -22,7 +22,7 @@ def read_get_from_host(action_name: str, response: Response):
     try:
         return {
             "success": True,
-            "data": service.run_action()
+            "data": cmd.execute()
         }
     except FileNotFoundError as e:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE

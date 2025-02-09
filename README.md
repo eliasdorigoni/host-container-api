@@ -1,7 +1,9 @@
 # Host Container API
 
-This project provides a FastAPI implementation to be run inside Docker and
-APIs to interact with named pipes. 
+This project provides a Docker container with an API to execute code on a host
+machine using named pipes. A program must be running continuously in the host.
+
+Linux only.
 
 ```yaml
 # docker-compose.yaml
@@ -13,4 +15,14 @@ services:
     restart: unless-stopped
     volumes:
       - ./host-container-api/:/app:
+```
+
+# Run
+
+```shell
+docker run --rm -p 8000:8000 -it $(docker build -q .)
+```
+
+```shell
+. ./host-machine/host-pipe-handler.sh
 ```

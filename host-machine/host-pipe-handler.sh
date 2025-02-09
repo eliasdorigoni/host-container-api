@@ -1,8 +1,8 @@
 #!/bin/bash
 
 THIS_DIR=$( cd -- "$( /usr/bin/dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && /usr/bin/pwd )
-CONTAINER_TO_HOST_PIPE="$THIS_DIR""/pipes/container_to_host.pipe"
-HOST_COMMANDS_PATH="$THIS_DIR""/host-commands"
+INCOMING_COMMANDS_PIPE_PATH="$THIS_DIR""/../pipes/container_to_host.pipe"
+HOST_COMMANDS_DIRECTORY="$THIS_DIR""/commands"
 PIPES_PATH="$THIS_DIR""/pipes"
 
 # Creates fifo file if it does not exist
@@ -12,15 +12,16 @@ create_fifo_if_not_exists() {
 
 # Creates files in output path with the names in actions directory
 create_pipes_from_script_names() {
-    SCRIPTS=$( find -P "$HOST_COMMANDS_PATH" -type f -name "*.sh" -printf "%f\n" | cut -d"/" -f2 | sed 's/.sh//g' )
+    SCRIPTS=$( find -P "$HOST_COMMANDS_DIRECTORY" -type f -name "*.sh" -printf "%f\n" | cut -d"/" -f2 | sed 's/.sh//g' )
     while IFS=' ' read -ra NAME; do
+        # shellcheck disable=SC2128
         create_fifo_if_not_exists "$PIPES_PATH""/""$NAME"".pipe"
     done <<< "$SCRIPTS"
 }
 
 # If incoming pipe has data, runs the command
 check_incoming_pipe() {
-  INPUT=$( cat "$CONTAINER_TO_HOST_PIPE" )
+  INPUT=$( cat "$INCOMING_COMMANDS_PIPE_PATH" )
   if [[ -z "$INPUT" ]]; then
       return
   fi
@@ -30,22 +31,23 @@ check_incoming_pipe() {
       return
   fi
 
-  if [ "$INPUT" == "get-date" ] \
-    || [ "$INPUT" == "status" ] \
-    || [ "$INPUT" == "get-home-server-existing-services" ] \
-    || [ "$INPUT" == "get-home-server-running-containers" ] \
-    || [ "$INPUT" == "get-proxymanager-hosts" ]; then
-    # shellcheck disable=SC1090
-    source "$HOST_COMMANDS_PATH""/""$INPUT"".sh" > "$PIPES_PATH""/""$INPUT"".pipe"
+  if ! [[ "$INPUT" =~ ^[a-z0-9-_]$ ]]; then
+    echo "ERROR: command must follow the pattern ^[a-z0-9-_]$"
     return
   fi
 
-  print "ERROR: unknown action ""$INPUT"
+  COMMAND_PATH="$HOST_COMMANDS_DIRECTORY""/""$INPUT"".sh"
+  if ! [ -f "$COMMAND_PATH" ]; then
+    echo "ERROR: unknown action ""$INPUT"
+    return
+  fi
+
+  # shellcheck source=/dev/null
+  source "$COMMAND_PATH" > "$PIPES_PATH""/""$INPUT"".pipe"
 }
 
-
 create_pipes_from_script_names
-create_fifo_if_not_exists "$CONTAINER_TO_HOST_PIPE"
+create_fifo_if_not_exists "$INCOMING_COMMANDS_PIPE_PATH"
 
 while true
 do
