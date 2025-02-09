@@ -37,3 +37,9 @@ def read_get_from_host(action_name: str, response: Response):
             "message": "Broken pipe",
             "error": str(e)
         }
+    except BaseException as e:
+        return {
+            "success": False,
+            "message": "Unhandled exception",
+            "error": str(e)
+        }

@@ -12,7 +12,7 @@ class FifoHandler:
             raise FileNotFoundError("FIFO file missing: {}".format(send_pipe_path.name))
 
         if not Path(receive_pipe_path).is_fifo():
-            raise FileNotFoundError("FIFO file not found: {}".format(receive_pipe_path))
+            raise FileNotFoundError("FIFO file not found: {}".format(receive_pipe_path.name))
 
         self.send_pipe_path = send_pipe_path
         self.receive_pipe_path = receive_pipe_path
