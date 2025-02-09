@@ -24,5 +24,6 @@ docker run --rm -p 8000:8000 -it $(docker build -q .)
 ```
 
 ```shell
+python -m venv venv
 . ./host-machine/host-pipe-handler.sh
 ```

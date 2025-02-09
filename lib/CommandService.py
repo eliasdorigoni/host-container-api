@@ -15,7 +15,7 @@ class CommandService:
         return self.command is not None
 
     # noinspection PyMethodMayBeStatic
-    def get_command_from_name(self, name) -> type[lib.Commands.AbstractCommand] | None:
+    def get_command_from_name(self, name: str) -> type[lib.Commands.AbstractCommand] | None:
         for _, obj in inspect.getmembers(lib.Commands):
             if inspect.isclass(obj) and issubclass(obj, lib.Commands.AbstractCommand) and obj.name == name:
                 return obj
