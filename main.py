@@ -22,7 +22,7 @@ def read_get_from_host(action_name: str, response: Response):
     try:
         return {
             "success": True,
-            "data": cmd.execute()
+            "data": cmd.request_execution()
         }
     except FileNotFoundError as e:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE

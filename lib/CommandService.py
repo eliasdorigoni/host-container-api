@@ -22,7 +22,7 @@ class CommandService:
 
         return None
 
-    def execute(self):
+    def request_execution(self):
         fh = FifoHandler(
             self.pipes_path.joinpath('container_to_host.pipe'),
             self.pipes_path.joinpath(str(self.command.name) + '.pipe')

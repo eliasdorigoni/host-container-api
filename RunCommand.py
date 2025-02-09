@@ -7,7 +7,7 @@ def main(command_name: str):
     cs = CommandService(command_name)
     if not cs.exists():
         exit(1)
-    print(cs.execute())
+    print(cs.request_execution())
 
 
 if __name__ == '__main__':
