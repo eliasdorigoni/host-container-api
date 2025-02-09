@@ -3,6 +3,8 @@
 THIS_DIR=$( cd -- "$( /usr/bin/dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && /usr/bin/pwd )
 INCOMING_COMMANDS_PIPE_PATH="$THIS_DIR""/pipes/container_to_host.pipe"
 PIPES_PATH="$THIS_DIR""/pipes"
+PYTHON_EXEC_PATH="$THIS_DIR""/venv/bin/python"
+SCRIPT_PATH="$THIS_DIR""/RunCommand.py"
 
 # Creates fifo file if it does not exist
 create_fifo_if_not_exists() {
@@ -21,8 +23,10 @@ check_incoming_pipe() {
       return
   fi
 
+  "$PYTHON_EXEC_PATH" "$SCRIPT_PATH" "$INPUT" > "$PIPES_PATH""/""$INPUT"".pipe"
+
   # shellcheck source=/dev/null
-  source "$HOST_COMMANDS_DIRECTORY""/""$INPUT"".sh" > "$PIPES_PATH""/""$INPUT"".pipe"
+  # source "$HOST_COMMANDS_DIRECTORY""/""$INPUT"".sh" > "$PIPES_PATH""/""$INPUT"".pipe"
 }
 
 # create_pipes_from_script_names
