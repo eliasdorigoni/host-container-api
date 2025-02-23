@@ -16,18 +16,31 @@ Tested on Debian. May run on MacOS.
 # Installation
 
 ```shell
-git clone <repo>
-cd <repo>
+# Clone this repo and cd into it
+git clone this-repo
+cd this-repo
+
+# Create a virtual environment
 python3 -m venv venv
+
+# Activate the virtual env
 source venv/bin/activate
+
+# Install required packages in virtual env
 pip install -r requirements.txt
+
+# Duplicate the config and customize to your needs
+cp example.config.yaml config.yaml
 ```
 
-To run the program, execute
+To run the program, execute either:
 ```shell
-cd <repo>
 source venv/bin/activate
 python listen.py
+
+# -- OR --
+
+venv/bin/python listen.py
 ```
 
 *TODO: add a script to ensure constant execution*
@@ -41,10 +54,10 @@ configured in `config.yaml` following this format:
 <pipe-name>:<command-name>
 ```
 
-pipe-name
+**pipe-name**
 : Where the response should be sent. Can be a fixed or random value.
 
-command-name
+**command-name**
 : Indicates which **command** should run. A command (in this context)
 is a class extending `AbstractCommand` that has a `name`
 property that has to be used to execute said class.
@@ -53,23 +66,23 @@ property that has to be used to execute said class.
 
 All **responses** to requests are written to the same directory configured in
 `config.yaml`, using the `pipe-name` received in the request as the pipe name.
-The content will always be a JSON-formatted string with this format:
+The content will always be a JSON-formatted object with 3 items:
 
-```json
+```text
 {
-  "success": bool,
-  "message": string,
+  "success": bool
+  "message": string
   "data": object
 }
 ```
 
-success
+**success**
 : true or false
 
-message
+**message**
 : empty if `success` is true, otherwise will contain some description
 
-data
+**data**
 : the command output
 
 # How to add custom commands
@@ -98,7 +111,10 @@ class ExampleCommand(AbstractCommand):
 Then run the `listen.py` file in one terminal, and in another run: 
 ```shell
 echo "my-custom-pipe:example-command" > pipes/in.pipe
-cat "my-custom-pipe"
+cat pipes/my-custom-pipe
+
+# Output
+
 ```
 
 It will display:
