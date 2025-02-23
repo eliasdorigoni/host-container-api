@@ -5,9 +5,11 @@ import select
 
 
 def create_pipe_if_missing(pipe_path):
-    if not pipe_path.exists():
+    try:
         os.makedirs(pipe_path)
         os.mkfifo(pipe_path)
+    except FileExistsError as e:  # this raises anyway
+        pass
 
 
 def send(message: str, pipe_path: Path, timeout_in_seconds: int = 3) -> None:
