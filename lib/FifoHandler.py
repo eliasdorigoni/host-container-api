@@ -4,12 +4,10 @@ from pathlib import Path
 import select
 
 
-def create_pipe_if_missing(pipe_path):
-    try:
-        os.makedirs(pipe_path)
+def create_pipe_if_missing(pipe_path: Path):
+    if not pipe_path.exists():
+        os.makedirs(pipe_path.parent)
         os.mkfifo(pipe_path)
-    except FileExistsError as e:  # this raises anyway
-        pass
 
 
 def send(message: str, pipe_path: Path, timeout_in_seconds: int = 3) -> None:
