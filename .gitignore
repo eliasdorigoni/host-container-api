@@ -7,3 +7,4 @@ __pycache__
 # Custom commands
 custom
 custom.config.yaml
+config.yaml

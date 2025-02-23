@@ -1,0 +1,6 @@
+pipes_directory: ./pipes
+input_pipe_filename: in.pipe
+
+commands:
+  some_custom_command:
+    some_key: some_value

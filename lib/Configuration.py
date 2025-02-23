@@ -15,10 +15,6 @@ class Configuration:
         with open(root_path.joinpath("config.yaml"), 'r') as stream:
             self.content = yaml.load(stream, Loader=yaml.CLoader)
 
-        if root_path.joinpath("custom.config.yaml").exists():
-            with open(root_path.joinpath("custom.config.yaml"), 'r') as stream:
-                self.content |= yaml.load(stream, Loader=yaml.CLoader)
-
         self.__resolve_paths()
 
     def __resolve_paths(self):
