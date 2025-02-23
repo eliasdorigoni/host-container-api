@@ -27,8 +27,9 @@ class CommandService:
         self.commands = self.commands | self.get_classes_from_file(src_path, 'Commands.py')
 
         src_path = self.config.root_path.joinpath('custom')
-        for filename in os.listdir(src_path):
-            self.commands = self.commands | self.get_classes_from_file(src_path, filename)
+        if src_path.exists():
+            for filename in os.listdir(src_path):
+                self.commands = self.commands | self.get_classes_from_file(src_path, filename)
 
     # noinspection PyMethodMayBeStatic
     def get_classes_from_file(self, source_path, filename) -> dict:
