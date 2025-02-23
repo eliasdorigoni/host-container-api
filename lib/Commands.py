@@ -1,15 +1,4 @@
-from abc import ABC, abstractmethod
-
-
-class AbstractCommand(ABC):
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        raise NotImplementedError
-
-    @abstractmethod
-    def run(self):
-        raise NotImplementedError
+from lib.AbstractCommand import AbstractCommand
 
 
 class Status(AbstractCommand):
@@ -19,8 +8,9 @@ class Status(AbstractCommand):
         return "ok"
 
 
-class Date(AbstractCommand):
-    name = "date"
+class CurrentPath(AbstractCommand):
+    name = "current-path"
 
     def run(self):
-        return "12345"
+        import os
+        return os.curdir

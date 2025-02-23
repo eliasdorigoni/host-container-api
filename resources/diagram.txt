@@ -1,0 +1,30 @@
+# sequencediagram.org
+
+title Host Container API
+
+participantgroup **Host Machine**
+
+participantgroup #lightblue **Docker**
+participant "Container" as container
+end
+
+participantgroup #lightgreen **Shared volume**
+participant "OUT pipe" as out
+participant "IN pipe" as in
+end
+
+participant "Host Container API" as host
+end
+
+host->in: reads file content
+activate in
+container->in: write string
+in-->>host: send string
+deactivate in
+
+note over host: run command(s)
+container->out: listen for content
+activate out
+host->out: write results
+out-->>container: send results
+deactivate out
