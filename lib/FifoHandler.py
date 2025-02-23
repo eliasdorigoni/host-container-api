@@ -1,57 +1,66 @@
 import os
 import selectors
 from pathlib import Path
-
 import select
 
 
-# noinspection PyMethodMayBeStatic
-class FifoHandler:
-    def __init__(self, send_pipe_path: Path, receive_pipe_path: Path):
-        if not Path(send_pipe_path).is_fifo():
-            raise FileNotFoundError("FIFO file missing: {}".format(send_pipe_path.name))
+def create_pipe_if_missing(pipe_path):
+    if not pipe_path.exists():
+        os.makedirs(pipe_path)
+        os.mkfifo(pipe_path)
 
-        if not Path(receive_pipe_path).is_fifo():
-            raise FileNotFoundError("FIFO file not found: {}".format(receive_pipe_path.name))
 
-        self.send_pipe_path = send_pipe_path
-        self.receive_pipe_path = receive_pipe_path
+def send(message: str, pipe_path: Path, timeout_in_seconds: int = 3) -> None:
+    """
+    Sends a message to a named pipe, optionally raising an exception on timeout.
+    :param message: JSON-formatted content
+    :param pipe_path: path to the fifo file
+    :param timeout_in_seconds: raises an exception after seconds passed. Set to 0 to disable
+    :return: None
+    """
+    fd = os.open(pipe_path, os.O_WRONLY)
 
-    def transmit(self, message: str, send_timeout: int = 1, receive_timeout: int = 3) -> str:
-        try:
-            # TODO: Lock process and continue, or wait until lock is removed
-            self.__send(message, self.send_pipe_path, send_timeout)
-            return self.__receive(self.receive_pipe_path, receive_timeout)
-        except BaseException as e:
-            raise e
-        finally:
-            # TODO: Remove lock
-            pass
-
-    def __send(self, message: str, fifo_path: Path, timeout_in_seconds: int) -> None:
-        fd = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
+    if timeout_in_seconds > 0:
         ready, _, _ = select.select([], [fd], [], timeout_in_seconds)
-
         if not ready:
             os.close(fd)
             raise TimeoutError("Timeout reached sending data")
 
-        with open(fd, 'w', buffering=1) as fh:
-            fh.write(message)
-            fh.flush()
+    with open(fd, 'w', buffering=1) as fh:
+        fh.write(message)
+        fh.flush()
 
-    def __receive(self, fifo_path: Path, timeout_in_seconds: int) -> str:
-        with open(fifo_path, 'r') as fifo:
-            sel = selectors.DefaultSelector()
-            sel.register(fifo, selectors.EVENT_READ)
+
+def receive(pipe_path: Path, timeout_in_seconds: int = 1) -> str:
+    """
+    Receives a message from a pipe
+    :param pipe_path: Path to pipe
+    :param timeout_in_seconds: raises an exception after seconds passed. Set to 0 to disable
+    :return: text received from pipe
+    """
+    with open(pipe_path, 'r') as fifo:
+        sel = selectors.DefaultSelector()
+        sel.register(fifo, selectors.EVENT_READ)
+
+        if timeout_in_seconds > 0:
             events = sel.select(timeout_in_seconds)
             if not events:
                 raise TimeoutError("Timeout reached receiving data")
 
-            for key, _ in sel.select():
-                # noinspection PyUnresolvedReferences
-                data = key.fileobj.read().strip()
-                if data:
-                    return data
+        for key, _ in sel.select():
+            # noinspection PyUnresolvedReferences
+            data = key.fileobj.read().strip()
+            if data:
+                return data
 
-        raise RuntimeError
+    raise RuntimeError
+
+
+def listen(fifo_path: Path) -> (str,str):
+    content = receive(fifo_path, 0)
+    # TODO: handle more than one line
+    parts = content.split(":")
+    if len(parts) == 2:
+        return parts
+
+    raise RuntimeError("Malformed content: \"{}\"".format(content))

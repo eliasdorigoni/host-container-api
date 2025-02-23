@@ -6,7 +6,7 @@ from lib.Configuration import Configuration
 
 def main():
     config = Configuration(Path(__file__).parent)
-    commands = CommandService.get_available_commands(config)
+    commands = CommandService(config).get_available_commands()
     print("Available commands:")
     for item in commands:
         print("  - \"{command_name}\" ({class_name})".format(
