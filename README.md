@@ -51,7 +51,7 @@ data
 # How to add custom commands
 
 Create a python class extending the `AbstractCommand` class and place it 
-inside the `custom` folder. The program will automatically read it from there. 
+inside the `commands` folder. The program will automatically read it from there. 
 
 ```python
 from lib.AbstractCommand import AbstractCommand

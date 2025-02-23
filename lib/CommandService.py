@@ -9,8 +9,6 @@ import lib.AbstractCommand
 
 
 class CommandService:
-    pipes_path = Path(__file__).resolve().parent.parent.joinpath('pipes')
-
     def __init__(self, config: Configuration):
         self.config = config
         self.commands = {}
@@ -24,9 +22,9 @@ class CommandService:
 
     def load_commands(self) -> None:
         src_path = self.config.root_path.joinpath('lib')
-        self.commands = self.commands | self.get_classes_from_file(src_path, 'Commands.py')
+        self.commands = self.get_classes_from_file(src_path, 'Commands.py')
 
-        src_path = self.config.root_path.joinpath('custom')
+        src_path = self.config.root_path.joinpath('commands')
         if src_path.exists():
             for filename in os.listdir(src_path):
                 self.commands = self.commands | self.get_classes_from_file(src_path, filename)
