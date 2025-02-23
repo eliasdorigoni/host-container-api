@@ -3,3 +3,7 @@ __pycache__
 *.pipe
 .idea
 .env
+
+# Custom commands
+custom
+custom.config.yaml
