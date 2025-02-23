@@ -9,9 +9,9 @@ from lib.ResponseFormatter import ResponseFormatter
 
 def main():
     config = Configuration(Path(__file__).parent)
-    in_pipe = config.get("pipes_directory").joinpath()
+    in_pipe = config.get("pipes_directory").joinpath(config.get("input_pipe_filename"))
     cs = CommandService(config)
-    FifoHandler.create_pipe_if_missing(config.get("pipes_directory").joinpath(config.get("input_pipe_filename")))
+    FifoHandler.create_pipe_if_missing(in_pipe)
     while True:
         fifo_name, command_name = FifoHandler.listen(in_pipe)
         output_pipe_path = config.get("pipes_directory").joinpath(fifo_name)
