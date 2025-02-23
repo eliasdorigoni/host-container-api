@@ -6,7 +6,7 @@ import select
 
 def create_pipe_if_missing(pipe_path: Path):
     if not pipe_path.exists():
-        os.makedirs(pipe_path.parent)
+        os.makedirs(pipe_path.parent, exist_ok=True)
         os.mkfifo(pipe_path)
 
 
@@ -18,13 +18,18 @@ def send(message: str, pipe_path: Path, timeout_in_seconds: int = 3) -> None:
     :param timeout_in_seconds: raises an exception after seconds passed. Set to 0 to disable
     :return: None
     """
+
+    with open(pipe_path, 'w') as fh:
+        fh.write(message)
+
+    return None
+
     fd = os.open(pipe_path, os.O_WRONLY)
 
-    if timeout_in_seconds > 0:
-        ready, _, _ = select.select([], [fd], [], timeout_in_seconds)
-        if not ready:
-            os.close(fd)
-            raise TimeoutError("Timeout reached sending data")
+    ready, _, _ = select.select([], [fd], [], timeout_in_seconds)
+    if not ready:
+        os.close(fd)
+        raise TimeoutError("Timeout reached sending data")
 
     with open(fd, 'w', buffering=1) as fh:
         fh.write(message)
