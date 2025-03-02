@@ -1,3 +1,5 @@
+[![Tests](https://github.com/eliasdorigoni/host-container-api/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/eliasdorigoni/host-container-api/actions/workflows/python-app.yml)
+
 # Host Container API
 
 Run commands in the host machine from a Docker container.
