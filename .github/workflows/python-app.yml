@@ -30,4 +30,4 @@ jobs:
         cp example.config.yaml config.yaml
     - name: Test
       run: |
-        python . -m unittest
+        python -m unittest
