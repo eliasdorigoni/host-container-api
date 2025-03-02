@@ -2,14 +2,13 @@ import importlib
 import inspect
 import os
 from importlib.util import spec_from_file_location
-from pathlib import Path
 
-from lib.Configuration import Configuration
-import lib.AbstractCommand
+from src.core.Config import Config
+from src.models.BaseAction import BaseAction
 
 
-class CommandService:
-    def __init__(self, config: Configuration):
+class ActionService:
+    def __init__(self, config: Config):
         self.config = config
         self.commands = {}
         self.load_commands()
@@ -21,8 +20,8 @@ class CommandService:
         return self.commands[command_name]().run()
 
     def load_commands(self) -> None:
-        src_path = self.config.root_path.joinpath('lib')
-        self.commands = self.get_classes_from_file(src_path, 'Commands.py')
+        src_path = self.config.root_path.joinpath('src')
+        self.commands = self.get_classes_from_file(src_path, 'utilities/ExampleActions.py')
 
         src_path = self.config.root_path.joinpath('commands')
         if src_path.exists():
@@ -43,7 +42,7 @@ class CommandService:
         spec.loader.exec_module(module)
 
         for name, obj in inspect.getmembers(module, inspect.isclass):
-            if obj.__module__ == module_name and issubclass(obj, lib.AbstractCommand.AbstractCommand):
+            if obj.__module__ == module_name and issubclass(obj, BaseAction):
                 classes[obj.name] = obj
         return classes
 

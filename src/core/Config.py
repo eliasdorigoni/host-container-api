@@ -4,22 +4,21 @@ from pathlib import Path
 import yaml
 
 
-class Configuration:
-    resolvable_paths = [
-        "pipes_directory",
-    ]
-
-    def __init__(self, root_path: Path):
-        self.root_path = root_path
+class Config:
+    def __init__(self):
+        self.root_path = Path(__file__).parent.parent.parent.absolute()
         self.content = None
-        with open(root_path.joinpath("config.yaml"), 'r') as stream:
+        with open(self.root_path.joinpath("config.yaml"), 'r') as stream:
             self.content = yaml.load(stream, Loader=yaml.CLoader)
 
-        self.__resolve_paths()
+        self.content["pipes_directory"] = self.__maybe_resolve_path(self.content["pipes_directory"])
 
-    def __resolve_paths(self):
-        for item in self.resolvable_paths:
-            self.content[item] = Path(self.content[item]).resolve()
+    def __maybe_resolve_path(self, p: str) -> Path:
+        p = Path(p)
+        if p.is_absolute():
+            return p
+
+        return self.root_path.joinpath(p).resolve()
 
     def get(self, key_name: str, default_value=None):
         def search_key(_dict, _key):

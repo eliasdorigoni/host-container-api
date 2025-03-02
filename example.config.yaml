@@ -1,6 +1,8 @@
 pipes_directory: ./pipes
 input_pipe_filename: in.pipe
+test_pipe_filename: test.pipe
 
+# Do not use "." as part of a key name. It's used to traverse child items.
 commands:
   some_custom_command:
     some_key: some_value

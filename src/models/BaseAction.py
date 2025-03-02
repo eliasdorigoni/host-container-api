@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class AbstractCommand(ABC):
+class BaseAction(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
