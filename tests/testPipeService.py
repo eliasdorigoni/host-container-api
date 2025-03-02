@@ -41,8 +41,8 @@ class TestPipeService(unittest.TestCase):
         output_pipe_path = self.config.get("pipes_directory").joinpath("test-output.pipe")
         message = "test-output.pipe:timestamp"
         partial_response = str(int(time.time()))
-
         PipeService.create_pipe_if_missing(input_pipe)
+        PipeService.create_pipe_if_missing(output_pipe_path)
 
         self.run_program_with(["listen-once", "--read-timeout=3"])
 
