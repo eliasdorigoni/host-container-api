@@ -5,6 +5,6 @@ __pycache__
 .env
 
 # Custom commands
-commands
-!commands/.gitkeep
+custom-commands
+!custom-commands/.gitkeep
 config.yaml

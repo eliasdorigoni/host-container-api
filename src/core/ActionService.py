@@ -23,7 +23,7 @@ class ActionService:
         src_path = self.config.root_path.joinpath('src')
         self.commands = self.get_classes_from_file(src_path, 'utilities/ExampleActions.py')
 
-        src_path = self.config.root_path.joinpath('commands')
+        src_path = self.config.root_path.joinpath('custom-commands')
         if src_path.exists():
             for filename in os.listdir(src_path):
                 self.commands = self.commands | self.get_classes_from_file(src_path, filename)
