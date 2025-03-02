@@ -37,12 +37,16 @@ class TestPipeService(unittest.TestCase):
         self.assertEqual(content, pipe_content)
 
     def test_can_send_content(self):
+        input_pipe = get_input_pipe(self.config)
         output_pipe_path = self.config.get("pipes_directory").joinpath("test-output.pipe")
         message = "test-output.pipe:timestamp"
         partial_response = str(int(time.time()))
+
+        PipeService.create_pipe_if_missing(input_pipe)
+
         self.run_program_with(["listen-once", "--read-timeout=3"])
 
-        PipeService.write_to_pipe(message, get_input_pipe(self.config), 3)
+        PipeService.write_to_pipe(message, input_pipe, 3)
         content = PipeService.read_from_pipe(output_pipe_path, 3)
 
         self.assertTrue(partial_response in content, "{} has no {}".format(content, partial_response))
