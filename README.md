@@ -12,9 +12,8 @@ Intended to be used in home servers requiring information like system temperatur
 free disk space, ram usage, etc, from a Docker container. Not intended to be 
 used in production.
 
-- ✅ Works on Linux.
-- 🤷‍♀️ May work on MacOS.
-- ❌ Does not work on Windows.
+- ✅ Works on Linux. Tested on Ubuntu and MacOS.
+- ❌ Does not work on Windows: named pipes require OS-specific code.
 
 
 ![Sequence diagram](resources/diagram.png "Sequence diagram")
