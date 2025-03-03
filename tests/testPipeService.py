@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import time
@@ -40,7 +41,7 @@ class TestPipeService(unittest.TestCase):
         input_pipe = get_input_pipe(self.config)
         output_pipe_path = self.config.get("pipes_directory").joinpath("test-output.pipe")
         message = "test-output.pipe:timestamp"
-        partial_response = str(int(time.time()))
+
         PipeService.create_pipe_if_missing(input_pipe)
         PipeService.create_pipe_if_missing(output_pipe_path)
 
@@ -49,4 +50,9 @@ class TestPipeService(unittest.TestCase):
         PipeService.write_to_pipe(message, input_pipe, 3)
         content = PipeService.read_from_pipe(output_pipe_path, 3)
 
-        self.assertTrue(partial_response in content, "{} has no {}".format(content, partial_response))
+        timestamp = json.loads(content)["data"]
+        delay_threshold = 2
+        now = int(time.time())
+        if now - timestamp > delay_threshold:
+            self.fail("content has no valid timestamp ({}): {}".format(str(now), content))
+
