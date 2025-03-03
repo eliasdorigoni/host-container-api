@@ -50,7 +50,7 @@ class TestPipeService(unittest.TestCase):
         PipeService.write_to_pipe(message, input_pipe, 3)
         content = PipeService.read_from_pipe(output_pipe_path, 3)
 
-        timestamp = json.loads(content)["data"]
+        timestamp = int(json.loads(content)["data"])
         delay_threshold = 2
         now = int(time.time())
         if now - timestamp > delay_threshold:
