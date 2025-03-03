@@ -1,4 +1,8 @@
+from __future__ import annotations
+
+import json
 from abc import ABC, abstractmethod
+from typing import AnyStr
 
 
 class BaseAction(ABC):
@@ -8,5 +12,19 @@ class BaseAction(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def run(self):
+    def run(self) -> ActionResponse:
         raise NotImplementedError
+
+
+class ActionResponse:
+    def __init__(self, data: AnyStr, is_success: bool = True, message: str = ""):
+        self.data = str(data)
+        self.is_success = is_success
+        self.message = message
+
+    def to_string(self):
+        return json.dumps({
+            "success": self.is_success,
+            "message": self.message,
+            "data": self.data,
+        })

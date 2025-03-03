@@ -4,7 +4,6 @@ __pycache__
 .idea
 .env
 
-# Custom commands
-custom-commands
-!custom-commands/.gitkeep
+custom-actions
+!custom-actions/.gitkeep
 config.yaml

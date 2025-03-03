@@ -4,29 +4,29 @@ import os
 from importlib.util import spec_from_file_location
 
 from src.core.Config import Config
-from src.models.BaseAction import BaseAction
+from src.models.BaseAction import BaseAction, ActionResponse
 
 
 class ActionService:
     def __init__(self, config: Config):
         self.config = config
-        self.commands = {}
-        self.load_commands()
+        self.actions = {}
+        self.load_actions()
 
-    def execute(self, command_name: str):
-        if command_name not in self.commands:
-            raise NotImplementedError("Command not found")
+    def execute(self, name: str) -> ActionResponse:
+        if name not in self.actions:
+            raise NotImplementedError("Action not found")
 
-        return self.commands[command_name]().run()
+        return self.actions[name]().run()
 
-    def load_commands(self) -> None:
+    def load_actions(self) -> None:
         src_path = self.config.root_path.joinpath('src')
-        self.commands = self.get_classes_from_file(src_path, 'utilities/ExampleActions.py')
+        self.actions = self.get_classes_from_file(src_path, 'models/ExampleActions.py')
 
-        src_path = self.config.root_path.joinpath('custom-commands')
+        src_path = self.config.root_path.joinpath('custom-actions')
         if src_path.exists():
             for filename in os.listdir(src_path):
-                self.commands = self.commands | self.get_classes_from_file(src_path, filename)
+                self.actions = self.actions | self.get_classes_from_file(src_path, filename)
 
     # noinspection PyMethodMayBeStatic
     def get_classes_from_file(self, source_path, filename) -> dict:
@@ -46,12 +46,12 @@ class ActionService:
                 classes[obj.name] = obj
         return classes
 
-    def get_available_commands(self) -> list[dict]:
+    def get_available_actions(self) -> list[dict]:
         _list = []
 
-        for name, obj in self.commands.items():
+        for name, obj in self.actions.items():
             _list.append({
-                "command_name": name,
+                "action_name": name,
                 "class_name": obj.__name__,
             })
 

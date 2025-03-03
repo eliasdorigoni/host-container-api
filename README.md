@@ -2,18 +2,22 @@
 
 # Host Container API
 
-Run commands in the host machine from a Docker container.
+Execute actions from requests received via [named pipes](https://en.wikipedia.org/wiki/Named_pipe).
 
-This is a python script running on the host machine that is listening to a named pipe,
-runs prepared commands and sends the response to another pipe. 
+This is a python script that is continually listening on a named pipe. When 
+keywords are received, it runs actions (not raw commands) and sends
+the response to another pipe in JSON format. 
 
-Intended to be used in home servers requiring host data.
+Intended to be used in home servers requiring information like system temperature, 
+free disk space, ram usage, etc, from a Docker container. Not intended to be 
+used in production.
+
+- ✅ Works on Linux.
+- 🤷‍♀️ May work on MacOS.
+- ❌ Does not work on Windows.
+
 
 ![Sequence diagram](resources/diagram.png "Sequence diagram")
-
-Do not install anywhere near production.
-
-Tested on Debian. May run on MacOS.
 
 # Installation
 
@@ -35,40 +39,39 @@ pip install -r requirements.txt
 cp example.config.yaml config.yaml
 ```
 
-To run the program, execute either:
+To run the program:
 ```shell
 source venv/bin/activate
-python listen.py
+python . listen
 
-# -- OR --
-
-venv/bin/python listen.py
+# Or use `python . -h` to see help
 ```
 
 *TODO: add a script to ensure constant execution*
 
 # Data format
 
-For **incoming requests**, all Docker containers should write to the same named pipe
-configured in `config.yaml` following this format:
+Both **requests** and **responses** are written to `*.pipe` files inside the
+directory established in `pipes_directory` in the configuration file (`config.yaml`). 
+
+For **incoming requests**, all programs must write to the file configured in 
+`input_pipe_filename` in the config file, following this format:
 
 ```txt
-<pipe-name>:<command-name>
+<pipe-name>:<action-name>
 ```
 
 **pipe-name**
-: Where the response should be sent. Can be a fixed or random value.
+: Where the response should be sent. Will be created if it does not exist.
 
-**command-name**
-: Indicates which **command** should run. A command (in this context)
-is a class extending `AbstractCommand` that has a `name`
-property that has to be used to execute said class.
+**action-name**
+: Indicates which **action** should run. An action is a class extending
+`AbstractCommand` that has a `name` property that can be used to be called upon.
 
 ---
 
-All **responses** to requests are written to the same directory configured in
-`config.yaml`, using the `pipe-name` received in the request as the pipe name.
-The content will always be a JSON-formatted object with 3 items:
+All **responses** to requests are written to the file specified in the `pipe-name`
+part of the request. The content will be a JSON-formatted object with 3 root items:
 
 ```text
 {
@@ -87,36 +90,34 @@ The content will always be a JSON-formatted object with 3 items:
 **data**
 : the command output
 
-# How to add custom commands
-The `commands` folder is git-ignored, so custom commands can be added without
+# Add custom commands
+The `/custom-commands` folder is git-ignored, so classes can be added without
 losing the ability to upgrade.
 
-1. Create a python class inside the `commands` folder
+1. Create a python class inside the `/custom-commands` folder
 2. Extend the `AbstractCommand` class
 3. Implement the abstract method and property required
-4. Optionally, run `python list-commands.py` to see if the command is listed
+4. Optionally, run `python . list-actions` to see if the command is listed
 5. Try the command using a pipe name and the `name` property 
 
 Example 
 
-`/commands/ExampleCommand.py`
+`/custom-actions/Example.py`
 ```python
-from lib.AbstractCommand import AbstractCommand
+from src.models.BaseAction import BaseAction, ActionResponse
 
-class ExampleCommand(AbstractCommand):
-    name = "example-command"
 
-    def run(self):
-        return "this is the response"
+class Example(BaseAction):
+    name = "example"
+
+    def run(self) -> ActionResponse:
+        return ActionResponse("this is the response")
 ```
 
-Then run the `listen.py` file in one terminal, and in another run: 
+Then run `python . listen-once` in a terminal, and in another run: 
 ```shell
-echo "my-custom-pipe:example-command" > pipes/in.pipe
-cat pipes/my-custom-pipe
-
-# Output
-
+echo "output.pipe:example" > pipes/input.pipe
+cat pipes/output.pipe
 ```
 
 It will display:

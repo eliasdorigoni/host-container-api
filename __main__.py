@@ -11,7 +11,7 @@ def main():
         case "listen-once":
             return ListenOnce.run(config, args)
         case "list-actions":
-            return ListActions.run(config, args)
+            return ListActions.run(config)
         case "listen":
             return Listen.run(config, args)
         case "test-write":

@@ -11,7 +11,7 @@ class TestListCommands(unittest.TestCase):
         config = Config()
 
         buffer = io.StringIO()
-        ListActions.run(config, None, buffer)
+        ListActions.run(config, buffer)
         output = buffer.getvalue()
 
         self.assertTrue("Status" in output, "Status class name not in output")
