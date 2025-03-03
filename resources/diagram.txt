@@ -1,24 +1,24 @@
 # sequencediagram.org
 
-participantgroup #white #lightgray:1 **Host Machine**
+title Host Machine
 
 participant "Host Container API" as host
 
 participantgroup #lightgreen :0 **Shared volume**
-participant "IN pipe" as in
-participant "OUT pipe" as out
+participant "input.pipe" as in
+participant "output.pipe" as out
 end
 
 participantgroup #lightblue :0 **Docker**
 participant "Container" as container
 end
 
-end
 
 host->in: read content
 activate in
 host->host: wait
 container->in: write string
+note over in:output.pipe:timestamp
 in-->>host: send string
 deactivate in
 destroysilent in
@@ -26,8 +26,9 @@ destroysilent in
 container->out: read content
 activate out
 container->container: wait
-note over host: run command(s)
+box over host: executes action\n"timestamp"
 host->out: write results
+note over out:{\n  "success": true,\n  "data": 1740977922,\n  "message": \"\"\n}
 out-->>container: send results
 deactivate out
 destroysilent out
